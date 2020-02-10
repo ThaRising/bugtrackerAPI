@@ -1,14 +1,18 @@
-import db
+from db import Database
 
 
 class Schema:
-    def __init__(self, database: db.Database):
-        self.database = database
+    """
+    Class to create schemas on the database before program gets started
+    """
+    def __init__(self):
         self.create_issueTable()
         self.create_userTable()
 
-    def create_issueTable(self):
-        self.database.connection.execute("""
+    @staticmethod
+    def create_issueTable():
+        """Creates he Issue Table if not yet created"""
+        Database.execute("""
             CREATE TABLE IF NOT EXISTS Issue (
             id INTEGER PRIMARY KEY,
             Title TEXT,
@@ -19,17 +23,25 @@ class Schema:
             CreatedOn Date DEFAULT CURRENT_DATE,
             DueDate Date)""")
 
-    def create_userTable(self):
-        self.database.connection.execute("""
+    @staticmethod
+    def create_userTable():
+        """Creates the User Table if not yet created"""
+        Database.execute("""
             CREATE TABLE IF NOT EXISTS User (
             id INTEGER PRIMARY KEY,
             Name TEXT,
             CreatedOn Date DEFAULT CURRENT_DATE )""")
 
 
-# class IssueModel:
-#     TABLENAME = "Issue"
-#     def __init__(self, database: db.Database):
-#         self.database = database
-#
-#     def
+class UserTable:
+    TABLENAME = "User"
+
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def createUser(values: dict) -> None:
+        """Creates a new User with a given set of values"""
+        Database.execute("""
+        INSERT INTO User VALUES 
+        (:id, :Name, :CreatedOn)""", values)
