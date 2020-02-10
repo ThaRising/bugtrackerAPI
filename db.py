@@ -2,10 +2,27 @@ import sqlite3
 
 
 class Database:
-    def __init__(self, database: str):
-        self.database = sqlite3.connect(database)
-        self.connection = self.database.cursor()
+    """
+    Format Database Interface
+    self.CONNECTION:
+    """
+    CONNECTION: sqlite3.connect = sqlite3.connect(":memory:")
+    CURSOR = CONNECTION.cursor()
+
+    def __init__(self):
+        pass
 
     def __del__(self):
-        self.database.commit()
-        self.database.close()
+        """Format interface for destructor"""
+        Database.CONNECTION.commit()
+        Database.CONNECTION.close()
+
+    @staticmethod
+    def execute(query: str, params=None) -> None:
+        """Formal interface for query execution"""
+        with Database.CONNECTION:
+            if params is None:
+                Database.CURSOR.execute(query)
+            elif type(params) == dict:
+                Database.CURSOR.execute(query, params)
+
