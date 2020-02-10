@@ -13,7 +13,7 @@ class Tag(db.Model):
 
 
 class Comment(db.Model):
-    parent_id = db.Column(db.Integer, db.ForeignKey('post.id'), primary_key=True)
+    parent_id = db.Column(db.Integer, db.ForeignKey('issue.id'), primary_key=True)
     comment_id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.Integer, db.ForeignKey('user.id'))
     content = db.Column(db.Text, nullable=False)
@@ -48,9 +48,8 @@ class Issue(db.Model):
     assignee = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     content = db.Column(db.Text)
     type = db.Column(db.Integer, db.ForeignKey('type.id'))
-    status = db.Column(db.Integer)
-    priority = db.Column(db.Integer)
-    comments = db.Column(db.Integer)
+    status = db.Column(db.Integer, nullable=False, default=0)
+    priority = db.Column(db.Integer, nullable=False, default=0)
 
     def __repr__(self):
         return f"Issue('{self.title}', '{self.reporter}', '{self.assignee}', '{self.content}', '{self.type}'," \
