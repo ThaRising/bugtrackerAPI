@@ -1,6 +1,6 @@
 from flask import Flask
-from models import Schema
-import db
+from models import Schema, UserTable
+from db import Database
 import sqlite3
 
 app = Flask(__name__)
@@ -12,14 +12,7 @@ def hello():
 
 
 if __name__ == "__main__":
-    data = sqlite3.connect(":memory:")
-    database = data.cursor()
-    database.execute("""
-        CREATE TABLE IF NOT EXISTS User (
-        id INTEGER PRIMARY KEY,
-        Name TEXT,
-        CreatedOn Date DEFAULT CURRENT_DATE )""")
-    database.execute("""INSERT INTO User VALUES ('7', 'Ben', '2')""")
-    database.execute("""SELECT * FROM User WHERE Name='Ben'""")
-    print(database.fetchall())
+    Schema()
+    UserTable.createUser({"id": "3", "Name": "Bon", "CreatedOn": "12345"})
+    print(Database.CURSOR.execute("SELECT * FROM User").fetchall())
     app.run(debug=True)
