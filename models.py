@@ -1,47 +1,57 @@
-from db import Database
+from app import db
+from datetime import datetime
 
 
-class Schema:
-    """
-    Class to create schemas on the database before program gets started
-    """
-    def __init__(self):
-        self.create_issueTable()
-        self.create_userTable()
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20), unique=True, nullable=False)
+    background = db.Column(db.String(7), nullable=False, default="#000000")
+    color = db.Column(db.String(7), nullable=False, default="#ffffff")
 
-    @staticmethod
-    def create_issueTable():
-        """Creates he Issue Table if not yet created"""
-        Database.execute("""
-            CREATE TABLE IF NOT EXISTS Issue (
-            id INTEGER PRIMARY KEY,
-            Title TEXT,
-            Desc TEXT,
-            Tags TEXT,
-            Assignee INTEGER DEFAULT 0,
-            Status INTEGER DEFAULT 0,
-            CreatedOn Date DEFAULT CURRENT_DATE,
-            DueDate Date)""")
-
-    @staticmethod
-    def create_userTable():
-        """Creates the User Table if not yet created"""
-        Database.execute("""
-            CREATE TABLE IF NOT EXISTS User (
-            id INTEGER PRIMARY KEY,
-            Name TEXT,
-            CreatedOn Date DEFAULT CURRENT_DATE )""")
+    def __repr__(self):
+        return f"Tag('{self.name}', '{self.background}', '{self.color}')"
 
 
-class UserTable:
-    TABLENAME = "User"
+class Comment(db.Model):
+    parent_id = db.Column(db.Integer, db.ForeignKey('post.id'), primary_key=True)
+    comment_id = db.Column(db.Integer, primary_key=True)
+    author = db.Column(db.Integer, db.ForeignKey('user.id'))
+    content = db.Column(db.Text, nullable=False)
+    edited = db.Column(db.Boolean, default=False)
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
 
-    def __init__(self):
-        pass
+    def __repr__(self):
+        return f"Comment('{self.author}', '{self.content}', '{self.edited}', '{self.created_on}')"
 
-    @staticmethod
-    def createUser(values: dict) -> None:
-        """Creates a new User with a given set of values"""
-        Database.execute("""
-        INSERT INTO User VALUES 
-        (:id, :Name, :CreatedOn)""", values)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20), nullable=False, unique=True)
+    created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
+
+    def __repr__(self):
+        return f"User('{self.id}', '{self.name}')"
+
+
+class Type(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20), nullable=False, unique=True)
+
+    def __repr__(self):
+        return f"Type('{self.id}', '{self.name}')"
+
+
+class Issue(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(60), nullable=False)
+    reporter = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    assignee = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    content = db.Column(db.Text)
+    type = db.Column(db.Integer, db.ForeignKey('type.id'))
+    status = db.Column(db.Integer)
+    priority = db.Column(db.Integer)
+    comments = db.Column(db.Integer)
+
+    def __repr__(self):
+        return f"Issue('{self.title}', '{self.reporter}', '{self.assignee}', '{self.content}', '{self.type}'," \
+               f"'{self.status}', '{self.priority}', '{self.comments}')"
