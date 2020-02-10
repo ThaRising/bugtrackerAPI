@@ -1,9 +1,9 @@
 from flask import Flask
-from models import Schema, UserTable
-from db import Database
-import sqlite3
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+db = SQLAlchemy(app)
 
 
 @app.route("/")
@@ -12,7 +12,4 @@ def hello():
 
 
 if __name__ == "__main__":
-    Schema()
-    UserTable.createUser({"id": "3", "Name": "Bon", "CreatedOn": "12345"})
-    print(Database.CURSOR.execute("SELECT * FROM User").fetchall())
     app.run(debug=True)
