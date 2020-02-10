@@ -11,3 +11,6 @@ __pycache__
 *.spec
 build
 dist
+
+# Exclude test databases
+*.db
