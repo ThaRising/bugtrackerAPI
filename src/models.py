@@ -12,6 +12,14 @@ class Tag(db.Model):
         return str({"name": self.name, "background": self.background, "color": self.color})
 
 
+class Type(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20), nullable=False, unique=True)
+
+    def __repr__(self):
+        return str({"name": self.name})
+
+
 class Comment(db.Model):
     parent_id = db.Column(db.Integer, db.ForeignKey('issue.id'), primary_key=True)
     comment_id = db.Column(db.Integer, primary_key=True)
@@ -32,14 +40,6 @@ class User(db.Model):
 
     def __repr__(self):
         return f"User('{self.id}', '{self.name}')"
-
-
-class Type(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), nullable=False, unique=True)
-
-    def __repr__(self):
-        return f"Type('{self.id}', '{self.name}')"
 
 
 class Issue(db.Model):
