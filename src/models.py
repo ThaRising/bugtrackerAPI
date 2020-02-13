@@ -9,7 +9,7 @@ class Tag(db.Model):
     color = db.Column(db.String(7), nullable=False, default="#ffffff")
 
     def __repr__(self):
-        return f"Tag('{self.name}', '{self.background}', '{self.color}')"
+        return str({"name": self.name, "background": self.background, "color": self.color})
 
 
 class Comment(db.Model):
@@ -21,7 +21,8 @@ class Comment(db.Model):
     created_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
 
     def __repr__(self):
-        return f"Comment('{self.author}', '{self.content}', '{self.edited}', '{self.created_on}')"
+        return str(
+            {"author": self.author, "content": self.content, "edited": self.edited, "created_on": self.created_on})
 
 
 class User(db.Model):
