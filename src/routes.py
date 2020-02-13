@@ -17,8 +17,8 @@ def handle_error(e):
 
 # Endpoints
 
-@app.route("/")
-def hello() -> str:
+@app.route("/", methods=["GET"])
+def root_get() -> str:
     return "API operational."
 
 
