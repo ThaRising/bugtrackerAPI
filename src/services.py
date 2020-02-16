@@ -1,7 +1,7 @@
 import src.models as models
 from src import db
 from werkzeug.wrappers import BaseResponse
-from typing import List
+from typing import List, Union
 
 
 class Service:
@@ -13,22 +13,22 @@ class Service:
         return self._model
 
     @model.setter
-    def model(self, model_):
+    def model(self, model_: any) -> None:
         if not isinstance(model_(), db.Model):
             raise TypeError("Model must be a SQLAlchemy Model class.")
         self._model = model_
 
     @model.deleter
-    def model(self):
+    def model(self) -> None:
         raise AttributeError("Cannot delete model attribute.")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"'{self.__class__.__name__}'('{self.model.__class__.__name__}')'"
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.model.query.all())
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: any) -> Union[db.Model, List[db.Model], None]:
         if type(item) == int:
             return self.get_all()[item]
         elif type(item) == str or type(item) == dict:
@@ -40,13 +40,13 @@ class Service:
         db.session.commit()
         return created_object
 
-    def get_all(self) -> List[db.Model]:
+    def get_all(self) -> Union[List[db.Model], None]:
         return self.model.query.all()
 
-    def get_by_attr(self, key) -> db.Model:
+    def get_by_attr(self, key) -> Union[db.Model, None]:
         return self.model.query.filter_by(name=key).first()
 
-    def update_by_attr(self, key, params: dict) -> db.Model:
+    def update_by_attr(self, key, params: dict) -> Union[db.Model, None]:
         updated_model = self[key]
         for field, value in params.items():
             setattr(updated_model, field, value)
