@@ -1,4 +1,4 @@
-name: D:\6_pyProjects\pyAPI\venv
+name: null
 channels:
   - defaults
 dependencies:
@@ -33,5 +33,3 @@ dependencies:
   - wheel=0.34.2=py37_0
   - win_inet_pton=1.1.0=py37_0
   - wincertstore=0.2=py37_0
-prefix: D:\6_pyProjects\pyAPI\venv
-
