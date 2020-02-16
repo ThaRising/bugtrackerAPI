@@ -151,5 +151,5 @@ class Issue(db.Model):
     def __repr__(self):
         return str(
             {"id": self.id, "title": self.title, "reporter": self.reporter, "assignee": self.assignee,
-             "content": self.description, "type": self.type, "status": self.status, "priority": self.priority,
+             "description": self.description, "type": self.type, "status": self.status, "priority": self.priority,
              "comments": self.comments})
