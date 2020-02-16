@@ -44,48 +44,31 @@ class Service:
         return self.model.query.all()
 
     def get_by_attr(self, key) -> db.Model:
-        raise NotImplementedError("get_by_attr method not defined.")
-
-    def update_by_attr(self, key, params: dict) -> db.Model:
-        raise NotImplementedError("update_by_attr method not defined.")
-
-    def delete_by_attr(self, key) -> None:
-        raise NotImplementedError("delete_by_attr method not defined.")
-
-    def backref_by_id(self, id_: int) -> db.Model:
-        raise NotImplementedError("backref_by_id method not defined.")
-
-
-class GenericNameService(Service):
-    def get_by_attr(self, key: str) -> db.Model:
         return self.model.query.filter_by(name=key).first()
 
-    def update_by_attr(self, key: str, params: dict) -> db.Model:
+    def update_by_attr(self, key, params: dict) -> db.Model:
         updated_model = self[key]
         for field, value in params.items():
             setattr(updated_model, field, value)
         db.session.commit()
         return updated_model
 
-    def delete_by_attr(self, key: str) -> None:
+    def delete_by_attr(self, key) -> None:
         db.session.delete(self[key])
         db.session.commit()
 
-    def backref_by_id(self, id_: int) -> db.Model:
-        return self.model.query.filter_by(id=id_).first()
 
-
-class TagService(GenericNameService):
+class TagService(Service):
     def __init__(self):
         super(TagService, self).__init__(models.Tag)
 
 
-class TypeService(GenericNameService):
+class TypeService(Service):
     def __init__(self):
         super(TypeService, self).__init__(models.Type)
 
 
-class UserService(GenericNameService):
+class UserService(Service):
     def __init__(self):
         super(UserService, self).__init__(models.User)
 
@@ -97,16 +80,10 @@ class CommentService(Service):
     def get_by_attr(self, key: dict) -> db.Model:
         return self.model.query.filter_by(**key).first()
 
-    def update_by_attr(self, key: dict, params: dict) -> db.Model:
-        updated_model = self[key]
-        for field, value in params.items():
-            setattr(updated_model, field, value)
-        db.session.commit()
-        return updated_model
 
-    def delete_by_attr(self, key: dict) -> None:
-        db.session.delete(self[key])
-        db.session.commit()
+class IssueService(Service):
+    def __init__(self):
+        super(IssueService, self).__init__(models.Issue)
 
-    def backref_by_id(self, composite: dict) -> db.Model:
-        return self.model.query.filter_by(**composite).first()
+    def get_by_attr(self, key: int) -> db.Model:
+        return self.model.query.filter_by(id=key).first()
