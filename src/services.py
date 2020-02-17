@@ -1,7 +1,6 @@
 import src.models as models
 from src import db
-from werkzeug.wrappers import BaseResponse
-from typing import List, Union
+from typing import List, Union, Dict
 
 
 class Service:
@@ -34,28 +33,34 @@ class Service:
         elif type(item) == str or type(item) == dict:
             return self.get_by_attr(item)
 
-    def create(self, params: dict) -> db.Model:
+    def create(self, params: Dict[str, Union[str, int]]) -> db.Model:
         created_object = self.model(**params)
         db.session.add(created_object)
         db.session.commit()
         return created_object
 
+    def update(self, model: db.Model, params: dict) -> Union[db.Model]:
+        for field, value in params.items():
+            setattr(model, field, value)
+        db.session.commit()
+        return model
+
+    def delete(self, model: db.Model) -> None:
+        """ Deletes a given row (represented by an instance of a db.Model class) inside of the database """
+        db.session.delete(model)
+        db.session.commit()
+
     def get_all(self) -> Union[List[db.Model], None]:
+        """ Returns all rows of the given Table """
         return self.model.query.all()
 
-    def get_by_attr(self, key) -> Union[db.Model, None]:
-        return self.model.query.filter_by(name=key).first()
+    def get_by_primary(self, id_: Union[id, List[int]]) -> Union[db.Model, None]:
+        """ Returns the row with the given primary key """
+        return self.model.query.get(id_).first()
 
-    def update_by_attr(self, key, params: dict) -> Union[db.Model, None]:
-        updated_model = self[key]
-        for field, value in params.items():
-            setattr(updated_model, field, value)
-        db.session.commit()
-        return updated_model
-
-    def delete_by_attr(self, key) -> None:
-        db.session.delete(self[key])
-        db.session.commit()
+    def get_by_attr(self, params: Dict[str, Union[str, int]]) -> List[Union[db.Model, None]]:
+        """ Returns all rows containing the given value in the given column """
+        return self.model.query.filter_by(**params).all()
 
 
 class TagService(Service):
@@ -77,13 +82,10 @@ class CommentService(Service):
     def __init__(self):
         super(CommentService, self).__init__(models.Comment)
 
-    def get_by_attr(self, key: dict) -> db.Model:
-        return self.model.query.filter_by(**key).first()
+    def get_by_primary(self, id_: Union[id, List[int]]) -> Union[db.Model, None]:
+        return self.model.query.get(id_).first()
 
 
 class IssueService(Service):
     def __init__(self):
         super(IssueService, self).__init__(models.Issue)
-
-    def get_by_attr(self, key: int) -> db.Model:
-        return self.model.query.filter_by(id=key).first()
