@@ -1,6 +1,7 @@
 from src import db
 import src.services as services
 from typing import Type, Union, Dict, List, Optional
+import ast
 
 
 class Controller:
@@ -72,6 +73,10 @@ class Controller:
     def get_by_attr(self, params):
         return self.service().get_by_attr(params)
 
+    def limit_return_parameters(self, id_: int, limit: List[str]) -> dict:
+        total = ast.literal_eval(str(self.get_by_primary(id_)))
+        return {key: total[key] for key in limit}
+
 
 class GenericNameController(Controller):
     def get_by_name(self, name: str) -> Optional[db.Model]:
@@ -112,7 +117,16 @@ class CommentController(Controller):
     def __init__(self):
         super(CommentController, self).__init__(services.CommentService)
 
+    def update_one(self, key: Union[int, List[int], dict], params: Dict[str, str]) -> Optional[db.Model]:
+        update_model = self._check_if_one(key)
+        if not update_model:
+            return
+        self.service().update(update_model, {"content": params.get("content"), "edited": True})
+
 
 class IssueController(Controller):
     def __init__(self):
         super(IssueController, self).__init__(services.IssueService)
+
+    def add_comment(self, comment: db.Model):
+        self.service().model.comments.append(comment)
