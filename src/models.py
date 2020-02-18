@@ -1,6 +1,10 @@
 from src import db
 from datetime import datetime
 
+tags_association = db.Table("tags_association",
+                            db.Column("issue_id", db.Integer, db.ForeignKey("issue.id")),
+                            db.Column("tag_id", db.Integer, db.ForeignKey("tag.id")))
+
 
 class Tag(db.Model):
     __tablename__ = "tag"
@@ -8,6 +12,7 @@ class Tag(db.Model):
     name = db.Column(db.String(20), unique=True, nullable=False)
     background = db.Column(db.String(6), nullable=False, default="000000")
     color = db.Column(db.String(6), nullable=False, default="ffffff")
+    issues = db.relationship("Issue", secondary=tags_association, back_populates="tags")
     __table_args__ = (
         db.CheckConstraint("length(name) > 0",
                            name="name_min_length"),
@@ -43,7 +48,7 @@ class Type(db.Model):
     __tablename__ = "type"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), nullable=False, unique=True)
-    issues = db.relationship("Issue", backref="parent")
+    issues = db.relationship("Issue", backref="type")
     __table_args__ = (
         db.CheckConstraint("length(name) > 0",
                            name="name_min_length"),
@@ -81,7 +86,7 @@ class User(db.Model):
 
 class Comment(db.Model):
     __tablename__ = "comment"
-    parent_id = db.Column(db.Integer, db.ForeignKey('issue.id'), nullable=False, primary_key=True)
+    parent_id = db.Column(db.Integer, db.ForeignKey('issue.id'))
     comment_id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
@@ -103,11 +108,6 @@ class Comment(db.Model):
             {"author": self.author, "content": self.content, "edited": self.edited, "created_on": self.created_on})
 
 
-tags_association = db.Table("tags_association",
-                            db.Column("issue_id", db.Integer, db.ForeignKey("issue.id")),
-                            db.Column("tag_id", db.Integer, db.ForeignKey("tag.id")))
-
-
 class Issue(db.Model):
     __tablename__ = "issue"
     id = db.Column(db.Integer, primary_key=True)
@@ -116,7 +116,7 @@ class Issue(db.Model):
     assignee = db.Column(db.Integer, db.ForeignKey('user.id'), default=None)
     description = db.Column(db.Text)
     type = db.Column(db.Integer, db.ForeignKey("type.id"), default=None)
-    tags = db.relationship("Tag", secondary=tags_association, backref=db.backref("issues", lazy="dynamic"))
+    tags = db.relationship("Tag", secondary=tags_association, back_populates="issues")
     status = db.Column(db.Integer, default=0)
     priority = db.Column(db.Integer, default=0)
     comments = db.relationship("Comment", backref="parent")
