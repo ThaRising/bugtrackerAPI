@@ -1,6 +1,6 @@
 import src.models as models
 from src import db
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Optional
 
 
 class Service:
@@ -50,15 +50,15 @@ class Service:
         db.session.delete(model)
         db.session.commit()
 
-    def get_all(self) -> Union[List[db.Model], None]:
+    def get_all(self) -> Optional[List[db.Model]]:
         """ Returns all rows of the given Table """
         return self.model.query.all()
 
-    def get_by_primary(self, id_: Union[id, List[int]]) -> Union[db.Model, None]:
+    def get_by_primary(self, id_: Union[id, List[int]]) -> Optional[db.Model]:
         """ Returns the row with the given primary key """
-        return self.model.query.get(id_).first()
+        return self.model.query.get(id_)
 
-    def get_by_attr(self, params: Dict[str, Union[str, int]]) -> List[Union[db.Model, None]]:
+    def get_by_attr(self, params: Dict[str, Union[str, int]]) -> List[Optional[db.Model]]:
         """ Returns all rows containing the given value in the given column """
         return self.model.query.filter_by(**params).all()
 
@@ -81,9 +81,6 @@ class UserService(Service):
 class CommentService(Service):
     def __init__(self):
         super(CommentService, self).__init__(models.Comment)
-
-    def get_by_primary(self, id_: Union[id, List[int]]) -> Union[db.Model, None]:
-        return self.model.query.get(id_).first()
 
 
 class IssueService(Service):
