@@ -29,6 +29,8 @@ class Controller:
         elif type(key) == dict:
             model = self.service().get_by_attr(key)
             model = model[0] if model and not len(model) > 1 else None
+        else:
+            return
         return model
 
     def create(self, params: Dict[str, Union[str, int]]) -> db.Model:
@@ -73,9 +75,12 @@ class Controller:
     def get_by_attr(self, params):
         return self.service().get_by_attr(params)
 
-    def limit_return_parameters(self, id_: int, limit: List[str]) -> dict:
-        total = ast.literal_eval(str(self.get_by_primary(id_)))
-        return {key: total[key] for key in limit}
+    def limit_return_parameters(self, models: List[db.Model], limit: List[str]) -> dict:
+        total = [ast.literal_eval(str(model)) for model in models]
+        all_ = list()
+        for dicts in total:
+            all_.append({key: total[key] for key in limit})
+        return all_
 
 
 class GenericNameController(Controller):
