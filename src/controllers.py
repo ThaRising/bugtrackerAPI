@@ -79,7 +79,7 @@ class Controller:
         total = [ast.literal_eval(str(model)) for model in models]
         all_ = list()
         for dicts in total:
-            all_.append({key: total[key] for key in limit})
+            all_.append({key: dicts.get(key) for key in limit})
         return all_
 
 
