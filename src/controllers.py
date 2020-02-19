@@ -76,6 +76,8 @@ class Controller:
         return self.service().get_by_attr(params)
 
     def limit_return_parameters(self, models: List[db.Model], limit: List[str]) -> dict:
+        if not limit:
+            return models
         total = [ast.literal_eval(str(model)) for model in models]
         all_ = list()
         for dicts in total:
