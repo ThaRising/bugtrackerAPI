@@ -1,5 +1,6 @@
 from src import db
 from datetime import datetime
+from src.constants import TOO_SHORT, TYPE_NOT_COLOR, OUT_OF_RANGE
 
 tags_association = db.Table("tags_association",
                             db.Column("issue_id", db.Integer, db.ForeignKey("issue.id")),
@@ -25,19 +26,19 @@ class Tag(db.Model):
     @db.validates("name")
     def validate_background(self, key, name: str) -> str:
         if len(name) < 1:
-            raise ValueError("attr name must be at least 1 character long.")
+            raise ValueError(TOO_SHORT)
         return name
 
     @db.validates("background")
     def validate_background(self, key, background: str) -> str:
         if len(background) <= 5:
-            raise ValueError("attr background must be a 6 digit hex value.")
+            raise ValueError(TYPE_NOT_COLOR)
         return background
 
     @db.validates("color")
     def validate_background(self, key, color: str) -> str:
         if len(color) <= 5:
-            raise ValueError("attr color must be a 6 digit hex value.")
+            raise ValueError(TYPE_NOT_COLOR)
         return color
 
     def __repr__(self) -> str:
@@ -81,7 +82,7 @@ class Type(db.Model):
     @db.validates("name")
     def validate_background(self, key, name: str) -> str:
         if len(name) < 1:
-            raise ValueError("attr name must be at least 1 character long.")
+            raise ValueError(TOO_SHORT)
         return name
 
     def __repr__(self) -> str:
@@ -124,7 +125,7 @@ class User(db.Model):
     @db.validates("name")
     def validate_background(self, key, name: str) -> str:
         if len(name) < 1:
-            raise ValueError("attr name must be at least 1 character long.")
+            raise ValueError(TOO_SHORT)
         return name
 
     def __repr__(self) -> str:
@@ -171,7 +172,7 @@ class Comment(db.Model):
     @db.validates("name")
     def validate_background(self, key, content: str) -> str:
         if len(content) < 1:
-            raise ValueError("attr content must be at least 1 character long.")
+            raise ValueError(TOO_SHORT)
         return content
 
     def __repr__(self) -> str:
@@ -232,19 +233,19 @@ class Issue(db.Model):
     @db.validates("title")
     def validate_background(self, key, title: str) -> str:
         if len(title) < 1:
-            raise ValueError("attr title must be at least 1 character long.")
+            raise ValueError(TOO_SHORT)
         return title
 
     @db.validates("priority")
     def validate_background(self, key, priority: int) -> int:
         if priority > 2:
-            raise ValueError("attr priority may not be larger than 2.")
+            raise ValueError(OUT_OF_RANGE)
         return priority
 
     @db.validates("status")
     def validate_background(self, key, status: int) -> int:
         if status > 5:
-            raise ValueError("attr status may not be larger than 2.")
+            raise ValueError(OUT_OF_RANGE)
         return status
 
     def __repr__(self) -> str:
