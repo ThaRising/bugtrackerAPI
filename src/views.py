@@ -1,5 +1,6 @@
-from src import app
+from src import app, db
 from flask import jsonify, request, make_response
+from flask.wrappers import Response
 from werkzeug.wrappers import BaseResponse
 import src.controllers as c
 from werkzeug.exceptions import HTTPException
@@ -7,81 +8,111 @@ from typing import Union, Tuple
 from flask.views import MethodView
 
 
-# Helpers
+# Helper-Functions
 
-def split_query() -> Tuple[list, int]:
-    limit_params = [j for j in request.args.keys() if not request.args.get(j)]
-    limit_size = int(request.args.get("size")) if request.args.get("size") else None
-    return limit_params, limit_size
+def split_query() -> Tuple[list, dict]:
+    """
+    :return: Query-String split by key-only pairs (keys) and key-value pairs (pairs)
+    """
+    keys = [j for j in request.args.keys() if not request.args.get(j)]
+    pairs = {j: request.args.get(j) for j in request.args.keys() if request.args.get(j)}
+    return keys, pairs
 
 
-# Error Handling
+def response_maker(content: Union[db.Model, list], code: int) -> Response:
+    """
+    :param content: Any amount of model instances
+    :param code: Desired response code
+    :return: Flask Response object containing a json version of the content parameter and the appropriate status code
+    """
+    code = 404 if code is 200 and not content else code
+    if type(content) == list and isinstance(content[0], db.Model):
+        content = [dict(i) for i in content]
+    elif isinstance(content, db.Model):
+        content = dict(content)
+    return make_response(jsonify(content), code)
+
+
+# Error-Handling
 
 @app.errorhandler(Exception)
-def handle_error(e):
+def handle_error(error_: Exception) -> BaseResponse:
+    """
+    :param error_: Python Exception object
+    :return: werkzeug BaseResponse object containing a properly formatted json version of the error
+    """
     code = 500
-    if isinstance(e, HTTPException):
-        code = e.code
-    return jsonify(error=str(e)), code
+    if isinstance(error_, HTTPException):
+        code = error_.code
+    return jsonify(error=str(error_)), code
 
 
 # Endpoints
 
 class TagEndpoint(MethodView):
     """ /api/tags """
-    def get(self) -> BaseResponse:
-        if not request.args:
-            return make_response(jsonify(str(c.TagController().get_all())), 200)
-        else:
-            limit_params, limit_size = split_query()
-            models = c.TagController().get_all()
-            info = c.TagController().limit_return_parameters(models, limit_params)[:limit_size]
-            return make_response(jsonify(info), 200)
+    def __init__(self):
+        self.controller = c.TagController
 
-    def post(self):
-        return make_response(jsonify(str(c.TagController().create(request.get_json()))), 201)
+    def get(self) -> BaseResponse:
+        """ GET /api/tags?query """
+        if not request.args:
+            content = self.controller().get_all()
+            return response_maker(content, 200)
+        else:
+            keys, pairs = split_query()
+            models = self.controller().get_all()
+            content = self.controller().limit_return_parameters(models, keys)[:pairs.get("size")]
+            return response_maker(content, 200)
+
+    def post(self) -> BaseResponse:
+        """ POST /api/tags content-type: application/json """
+        content = self.controller().create(request.get_json())
+        return response_maker(content, 201)
 
 
 class TagItemEndpoint(MethodView):
     """ /api/tags/<item_name> """
-    def get(self, item_name: int) -> BaseResponse:
-        return make_response(jsonify(str(c.TagController().get_by_primary(item_name))), 200)
+    def __init__(self):
+        self.controller = c.TagController
+
+    def get(self, item_name: str) -> BaseResponse:
+        """ GET /api/tags/<item_name>?query """
+        if not request.args:
+            content = self.controller().get_by_primary(int(item_name))
+            return response_maker(content, 200)
+        else:
+            keys, pairs = split_query()
+            if pairs.get("filter") == "id":
+                content = self.controller().get_by_primary(int(item_name))
+                content = self.controller().limit_return_parameters(content, keys)
+                return response_maker(content, 200)
+            elif pairs.get("filter") == "name":
+                content = self.controller().get_by_name(item_name)
+                content = self.controller().limit_return_parameters(content, keys)
+                return response_maker(content, 200)
+            elif pairs.get("filter"):
+                content = self.controller().get_by_attr({pairs.get("filter"): item_name})
+                content = self.controller().limit_return_parameters(content, keys)
+                return response_maker(content, 200)
 
     def patch(self, item_name: int) -> BaseResponse:
-        return make_response(jsonify(str(c.TagController().update_one(int(item_name), request.get_json()))), 200)
+        """ PATCH /api/tags/<item_name> """
+        content = self.controller().update_one(int(item_name), request.get_json())
+        return response_maker(content, 200)
 
     def delete(self, item_name: int) -> BaseResponse:
-        if c.TagController().delete_one(int(item_name)):
-            return make_response(jsonify(status="SUCCESS"), 204)
+        """ DELETE /api/tags/<item_name> """
+        content = self.controller().delete_one(int(item_name))
+        if not content:
+            return response_maker(content, 404)
         else:
-            return make_response(jsonify(status="ERR_NOT_FOUND"), 404)
-
-
-class UserEndpoint(MethodView):
-    """ /api/users """
-    def get(self):
-        pass
+            return response_maker(content, 204)
 
 
 @app.route("/api", methods=["GET"])
 def root_get() -> str:
-    return "API operational."
-
-
-@app.route('/api/issues', methods=["GET", "POST"])
-def issues() -> BaseResponse:
-    if request.query_string:
-        query = [i for i in request.query_string.decode("utf-8").split("&")]
-        requested_parameters = [i for i in query if "=" not in i]
-        requested_parameter_values = {i.split("=")[0]: i.split("=")[1] for i in query if "=" in i}
-        size = None if "size" not in requested_parameter_values.keys() else int(requested_parameter_values.get("size"))
-        if request.method == "GET":
-            models = c.IssueController().get_all()
-            return jsonify(str(c.IssueController().limit_return_parameters(models, requested_parameters)[:size]))
-    if request.method == "GET":
-        return jsonify(str(c.IssueController().get_all()))
-    elif request.method == "POST":
-        return jsonify(str(c.IssueController().create(request.get_json())))
+    return make_response("API operational.", 200)
 
 
 app.add_url_rule("/api/tags", view_func=TagEndpoint.as_view("tag_endpoint"))
