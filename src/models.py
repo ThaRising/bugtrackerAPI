@@ -40,8 +40,33 @@ class Tag(db.Model):
             raise ValueError("attr color must be a 6 digit hex value.")
         return color
 
-    def __repr__(self):
-        return str({"name": self.name, "background": self.background, "color": self.color})
+    def __repr__(self) -> str:
+        """
+        Gives back a string representation of the object.
+
+        :return: String
+        """
+        return f"{self.__class__.__name__}" \
+               f"('name': '{self.name}', 'background': '{self.background}', 'color': '{self.color}')"
+
+    def __iter__(self) -> None:
+        """
+        Yields the items attributes as a dictionary.
+
+        :return: None
+        """
+        yield "id", self.id
+        yield "name", self.name
+        yield "background", self.background
+        yield "color", self.color
+
+    def __len__(self) -> int:
+        """
+        Returns the total number of the tables SQL columns.
+
+        :return: Integer
+        """
+        return 4
 
 
 class Type(db.Model):
@@ -59,8 +84,31 @@ class Type(db.Model):
             raise ValueError("attr name must be at least 1 character long.")
         return name
 
-    def __repr__(self):
-        return str({"name": self.name})
+    def __repr__(self) -> str:
+        """
+        Gives back a string representation of the object.
+
+        :return: String
+        """
+        return f"{self.__class__.__name__}('name': '{self.name}')"
+
+    def __iter__(self) -> None:
+        """
+        Yields the items attributes as a dictionary.
+
+        :return: None
+        """
+        yield "id", self.id
+        yield "name", self.name
+
+    def __len__(self) -> int:
+        """
+        Returns the total number of the tables SQL columns.
+
+        :return: Integer
+        """
+        return 2
+
 
 
 class User(db.Model):
@@ -79,14 +127,38 @@ class User(db.Model):
             raise ValueError("attr name must be at least 1 character long.")
         return name
 
-    def __repr__(self):
-        return str({"id": self.id, "name": self.name})
+    def __repr__(self) -> str:
+        """
+        Gives back a string representation of the object.
+
+        :return: String
+        """
+        return f"{self.__class__.__name__}('name': '{self.name}', 'created_on': '{self.created_on}')"
+
+    def __iter__(self) -> None:
+        """
+        Yields the items attributes as a dictionary.
+
+        :return: None
+        """
+        yield "id", self.id
+        yield "name", self.name
+        yield "created_on", self.created_on
+
+    def __len__(self) -> int:
+        """
+        Returns the total number of the tables SQL columns.
+
+        :return: Integer
+        """
+        return 3
+
 
 
 class Comment(db.Model):
     __tablename__ = "comment"
+    id = db.Column(db.Integer, primary_key=True)
     parent_id = db.Column(db.Integer, db.ForeignKey('issue.id'))
-    comment_id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
     edited = db.Column(db.Boolean, default=False)
@@ -102,9 +174,37 @@ class Comment(db.Model):
             raise ValueError("attr content must be at least 1 character long.")
         return content
 
-    def __repr__(self):
-        return str(
-            {"author": self.author, "content": self.content, "edited": self.edited, "created_on": self.created_on})
+    def __repr__(self) -> str:
+        """
+        Gives back a string representation of the object.
+
+        :return: String
+        """
+        return f"{self.__class__.__name__}" \
+               f"('id': '{self.id}', 'parent_id': '{self.parent_id}', 'author': '{self.author}'," \
+               f" 'content': '{self.content}', 'edited': '{self.edited}', 'created_on': '{self.created_on}')"
+
+    def __iter__(self) -> None:
+        """
+        Yields the items attributes as a dictionary.
+
+        :return: None
+        """
+        yield "id", self.id
+        yield "parent_id", self.parent_id
+        yield "author", self.author
+        yield "content", self.content
+        yield "edited", self.edited
+        yield "created_on", self.created_on
+
+    def __len__(self) -> int:
+        """
+        Returns the total number of the tables SQL columns.
+
+        :return: Integer
+        """
+        return 6
+
 
 
 class Issue(db.Model):
@@ -147,8 +247,40 @@ class Issue(db.Model):
             raise ValueError("attr status may not be larger than 2.")
         return status
 
-    def __repr__(self):
-        return str(
-            {"id": self.id, "title": self.title, "reporter": self.reporter, "assignee": self.assignee,
-             "description": self.description, "type": self.type, "status": self.status, "priority": self.priority,
-             "comments": self.comments})
+    def __repr__(self) -> str:
+        """
+        Gives back a string representation of the object.
+
+        :return: String
+        """
+        return f"{self.__class__.__name__}" \
+               f"('title': '{self.title}', 'reporter': '{self.reporter}', 'assignee': '{self.assignee}'," \
+               f"'description': '{self.description}', 'type': '{self.type}', 'status': '{self.status}'," \
+               f"'priority': '{self.priority}')"
+
+    def __iter__(self) -> None:
+        """
+        Yields the items attributes as a dictionary.
+
+        :return: None
+        """
+        yield "id", self.id
+        yield "title", self.title
+        yield "reporter", self.reporter
+        yield "assignee", self.assignee
+        yield "description", self.description
+        yield "type", self.type
+        yield "tags", self.tags
+        yield "status", self.status
+        yield "priority", self.priority
+        yield "comments", self.comments
+        yield "created_on", self.created_on
+
+    def __len__(self) -> int:
+        """
+        Returns the total number of the tables SQL columns.
+
+        :return: Integer
+        """
+        return 9
+
