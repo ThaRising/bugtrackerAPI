@@ -15,7 +15,7 @@ dependencies:
   - itsdangerous=1.1.0=py37_0
   - jinja2=2.11.1=py_0
   - markupsafe=1.1.1=py37he774522_0
-  - openssl=1.1.1d=he774522_4
+  - openssl=1.1.1d=he774522_3
   - pip=20.0.2=py37_1
   - pycparser=2.19=py37_0
   - pyopenssl=19.1.0=py37_0
@@ -33,3 +33,5 @@ dependencies:
   - wheel=0.34.2=py37_0
   - win_inet_pton=1.1.0=py37_0
   - wincertstore=0.2=py37_0
+  - pip:
+    - flask-testing==0.7.1
