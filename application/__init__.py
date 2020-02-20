@@ -1,12 +1,24 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-def create_app(testing: bool =False):
-    app = Flask(__name__)
-    
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
-from src import models
-from src import views
+
+def create_app(env_type: str = "dev"):
+    app = Flask(__name__, instance_relative_config=False)
+    if env_type == "dev":
+        app.config.from_object("application.config.DevelopmentConfig")
+    elif env_type == "test":
+        app.config.from_object("application.config.TestingConfig")
+    else:
+        app.config.from_object("application.config.Config")
+
+    db.init_app(app)
+
+    with app.app_context():
+        from . import views
+        from . import models
+        app.add_url_rule("/api/tags", view_func=views.TagEndpoint.as_view("tag_endpoint"))
+        app.add_url_rule("/api/tags/<item_name>", view_func=views.TagItemEndpoint.as_view("tag_item_endpoint"))
+
+        return app
