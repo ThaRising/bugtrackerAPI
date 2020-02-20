@@ -1,5 +1,5 @@
-from src import db
-import src.services as services
+from application import db
+import application.services as services
 from typing import Type, Union, Dict, List, Optional
 import ast
 

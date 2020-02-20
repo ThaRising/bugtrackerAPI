@@ -1,8 +1,9 @@
-from src import app, db
+from application import db
 from flask import jsonify, request, make_response
+from flask import current_app as app
 from flask.wrappers import Response
 from werkzeug.wrappers import BaseResponse
-import src.controllers as c
+import application.controllers as c
 from werkzeug.exceptions import HTTPException
 from typing import Union, Tuple
 from flask.views import MethodView
@@ -113,7 +114,3 @@ class TagItemEndpoint(MethodView):
 @app.route("/api", methods=["GET"])
 def root_get() -> str:
     return make_response("API operational.", 200)
-
-
-app.add_url_rule("/api/tags", view_func=TagEndpoint.as_view("tag_endpoint"))
-app.add_url_rule("/api/tags/<item_name>", view_func=TagItemEndpoint.as_view("tag_item_endpoint"))

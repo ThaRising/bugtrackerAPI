@@ -1,6 +1,6 @@
-from src import db
+from application import db
 from datetime import datetime
-from src.constants import TOO_SHORT, TYPE_NOT_COLOR, OUT_OF_RANGE
+from application.constants import TOO_SHORT, TYPE_NOT_COLOR, OUT_OF_RANGE
 
 tags_association = db.Table("tags_association",
                             db.Column("issue_id", db.Integer, db.ForeignKey("issue.id")),

@@ -1,5 +1,5 @@
-import src.models as models
-from src import db
+import application.models as models
+from application import db
 from typing import List, Union, Dict, Optional
 
 
