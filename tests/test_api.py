@@ -1,12 +1,14 @@
 from flask_testing import TestCase
-import requests
 from application import create_app, db
+import unittest
 
 
-class TestApi(TestCase):
+class BaseTestCase(TestCase):
     def create_app(self):
-        return create_app("test")
+        return create_app('test')
 
+
+class TestApi(BaseTestCase):
     def setUp(self):
         db.create_all()
 
@@ -15,5 +17,9 @@ class TestApi(TestCase):
         db.drop_all()
 
     def test_available(self):
-        response = requests.get("http://localhost:5000/api")
-        self.assertEquals(response.status_code, 200)
+        response = self.client.get("http://localhost:5000/api")
+        self.assertEqual(response.status_code, 200)
+
+
+if __name__ == '__main__':
+    unittest.main()
