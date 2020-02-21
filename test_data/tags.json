@@ -1,0 +1,28 @@
+{
+  "validation_success": [
+    {
+      "name": "Frontend"
+    }, {
+      "name": "Backend",
+      "background": "212121",
+      "color": "ffffff"
+    }, {
+      "name": "Quality Assurance",
+      "color": "565656"
+    }
+  ],
+  "validation_fail": [
+    {
+      "name": ""
+    }, {
+      "name": "Not Backend",
+      "background": "12345"
+    }, {
+      "name": "Not Frontend",
+      "color": "f0f0f0f"
+    }, {
+      "color": "ffffff",
+      "background": "ffffff"
+    }
+  ]
+}
