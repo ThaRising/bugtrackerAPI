@@ -23,6 +23,7 @@ def create_app(env_type: str = "dev"):
     api.init_app(app)
 
     with app.app_context():
+        from . import views
         from .views.tag import api as tag_namespace
         api.add_namespace(tag_namespace, path="/api/tags")
         from . import models

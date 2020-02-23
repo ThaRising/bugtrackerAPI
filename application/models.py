@@ -103,7 +103,6 @@ class Type(db.Model):
         return 2
 
 
-
 class User(db.Model):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
@@ -184,6 +183,11 @@ class Comment(db.Model):
         :return: Returns the total number of the tables SQL columns
         """
         return 6
+
+
+@db.event.listens_for(Comment.content, "modified")
+def modified(target, initiator):
+    print(target)
 
 
 class Issue(db.Model):

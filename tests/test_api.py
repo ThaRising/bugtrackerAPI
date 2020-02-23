@@ -2,6 +2,7 @@ from flask_testing import TestCase
 from application import create_app, db
 import unittest
 import json
+from pathlib import Path
 
 
 class BaseTestCase(TestCase):
@@ -12,10 +13,12 @@ class BaseTestCase(TestCase):
 class TestTag(BaseTestCase):
     def setUp(self):
         db.create_all()
-        with open("/tests/test_data\\tags.json") as json_file:
-            self.data = json.load(json_file)
-        self.test_success = self.data["validation_success"]
-        self.test_fails = self.data["validation_fail"]
+        #data_folder = Path("test_data/")
+        #file_to_open = data_folder / "tags.json"
+        #with open(file_to_open) as json_file:
+        #    self.data = json.load(json_file)
+        #self.test_success = self.data["validation_success"]
+        #self.test_fails = self.data["validation_fail"]
 
     def tearDown(self):
         db.session.remove()
@@ -26,7 +29,7 @@ class TestTag(BaseTestCase):
         Test general availability of the API
         GET /api
         """
-        base_url = "http://localhost:5000/api"
+        base_url = "http://localhost:5000/api/"
         response = self.client.get(base_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data.decode("utf-8"), "API operational.")
