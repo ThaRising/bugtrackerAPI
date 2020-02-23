@@ -19,8 +19,12 @@ class Tag(db.Model):
                            name="name_min_length"),
         db.CheckConstraint("length(background) > 5",
                            name="background_min_length"),
+        db.CheckConstraint("length(background) < 7",
+                           name="background_max_length"),
         db.CheckConstraint("length(color) > 5",
                            name="color_min_length"),
+        db.CheckConstraint("length(color) < 7",
+                           name="color_max_length"),
     )
 
     @db.validates("name")
@@ -31,30 +35,26 @@ class Tag(db.Model):
 
     @db.validates("background")
     def validate_background(self, key, background: str) -> str:
-        if len(background) <= 5:
+        if len(background) <= 5 or len(background) >= 7:
             raise ValueError(TYPE_NOT_COLOR)
         return background
 
     @db.validates("color")
     def validate_background(self, key, color: str) -> str:
-        if len(color) <= 5:
+        if len(color) <= 5 or len(color) >= 7:
             raise ValueError(TYPE_NOT_COLOR)
         return color
 
     def __repr__(self) -> str:
         """
-        Gives back a string representation of the object.
-
-        :return: String
+        :return: Returns a string representation of the object
         """
         return f"{self.__class__.__name__}" \
                f"('name': '{self.name}', 'background': '{self.background}', 'color': '{self.color}')"
 
     def __iter__(self) -> None:
         """
-        Yields the items attributes as a dictionary.
-
-        :return: None
+        :return: Yields the items attributes as a dictionary
         """
         yield "id", self.id
         yield "name", self.name
@@ -63,9 +63,7 @@ class Tag(db.Model):
 
     def __len__(self) -> int:
         """
-        Returns the total number of the tables SQL columns.
-
-        :return: Integer
+        :return: Returns the total number of the tables SQL columns
         """
         return 4
 
@@ -87,26 +85,20 @@ class Type(db.Model):
 
     def __repr__(self) -> str:
         """
-        Gives back a string representation of the object.
-
-        :return: String
+        :return: Returns a string representation of the object
         """
         return f"{self.__class__.__name__}('name': '{self.name}')"
 
     def __iter__(self) -> None:
         """
-        Yields the items attributes as a dictionary.
-
-        :return: None
+        :return: Yields the items attributes as a dictionary
         """
         yield "id", self.id
         yield "name", self.name
 
     def __len__(self) -> int:
         """
-        Returns the total number of the tables SQL columns.
-
-        :return: Integer
+        :return: Returns the total number of the tables SQL columns
         """
         return 2
 
@@ -130,17 +122,13 @@ class User(db.Model):
 
     def __repr__(self) -> str:
         """
-        Gives back a string representation of the object.
-
-        :return: String
+        :return: Returns a string representation of the object
         """
         return f"{self.__class__.__name__}('name': '{self.name}', 'created_on': '{self.created_on}')"
 
     def __iter__(self) -> None:
         """
-        Yields the items attributes as a dictionary.
-
-        :return: None
+        :return: Yields the items attributes as a dictionary
         """
         yield "id", self.id
         yield "name", self.name
@@ -148,12 +136,9 @@ class User(db.Model):
 
     def __len__(self) -> int:
         """
-        Returns the total number of the tables SQL columns.
-
-        :return: Integer
+        :return: Returns the total number of the tables SQL columns
         """
         return 3
-
 
 
 class Comment(db.Model):
@@ -177,9 +162,7 @@ class Comment(db.Model):
 
     def __repr__(self) -> str:
         """
-        Gives back a string representation of the object.
-
-        :return: String
+        :return: Returns a string representation of the object
         """
         return f"{self.__class__.__name__}" \
                f"('id': '{self.id}', 'parent_id': '{self.parent_id}', 'author': '{self.author}'," \
@@ -187,9 +170,7 @@ class Comment(db.Model):
 
     def __iter__(self) -> None:
         """
-        Yields the items attributes as a dictionary.
-
-        :return: None
+        :return: Yields the items attributes as a dictionary
         """
         yield "id", self.id
         yield "parent_id", self.parent_id
@@ -200,12 +181,9 @@ class Comment(db.Model):
 
     def __len__(self) -> int:
         """
-        Returns the total number of the tables SQL columns.
-
-        :return: Integer
+        :return: Returns the total number of the tables SQL columns
         """
         return 6
-
 
 
 class Issue(db.Model):
@@ -250,9 +228,7 @@ class Issue(db.Model):
 
     def __repr__(self) -> str:
         """
-        Gives back a string representation of the object.
-
-        :return: String
+        :return: Returns a string representation of the object.
         """
         return f"{self.__class__.__name__}" \
                f"('title': '{self.title}', 'reporter': '{self.reporter}', 'assignee': '{self.assignee}'," \
@@ -261,9 +237,7 @@ class Issue(db.Model):
 
     def __iter__(self) -> None:
         """
-        Yields the items attributes as a dictionary.
-
-        :return: None
+        :return: Yields the items attributes as a dictionary.
         """
         yield "id", self.id
         yield "title", self.title
@@ -279,9 +253,6 @@ class Issue(db.Model):
 
     def __len__(self) -> int:
         """
-        Returns the total number of the tables SQL columns.
-
-        :return: Integer
+        :return: Returns the total number of the tables SQL columns
         """
         return 9
-

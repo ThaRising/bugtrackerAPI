@@ -1,5 +1,5 @@
 from application import db
-from flask import jsonify, request, make_response
+from flask import jsonify, request, make_response, abort
 from flask import current_app as app
 from flask.wrappers import Response
 from werkzeug.wrappers import BaseResponse
@@ -7,9 +7,8 @@ import application.controllers as c
 from werkzeug.exceptions import HTTPException
 from typing import Union, Tuple
 from flask.views import MethodView
+import json
 
-
-# Helper-Functions
 
 def split_query() -> Tuple[list, dict]:
     """
@@ -36,6 +35,21 @@ def response_maker(content: Union[db.Model, list], code: int) -> Response:
 
 # Error-Handling
 
+@app.errorhandler(406)
+def handle_not_acceptable(error_) -> BaseResponse:
+    return make_response(jsonify(error="ERR_NOT_ACCEPTABLE"), 406)
+
+
+@app.errorhandler(400)
+def handle_not_acceptable(error_) -> BaseResponse:
+    return make_response(jsonify(error="ERR_BAD_REQUEST"), 400)
+
+
+@app.errorhandler(415)
+def handle_not_acceptable(error_) -> BaseResponse:
+    return make_response(jsonify(error="ERR_NOT_JSON"), 415)
+
+
 @app.errorhandler(Exception)
 def handle_error(error_: Exception) -> BaseResponse:
     """
@@ -48,67 +62,6 @@ def handle_error(error_: Exception) -> BaseResponse:
     return jsonify(error=str(error_)), code
 
 
-# Endpoints
-
-class TagEndpoint(MethodView):
-    """ /api/tags """
-    def __init__(self):
-        self.controller = c.TagController
-
-    def get(self) -> BaseResponse:
-        """ GET /api/tags?query """
-        if not request.args:
-            content = self.controller().get_all()
-            return response_maker(content, 200)
-        else:
-            keys, pairs = split_query()
-            models = self.controller().get_all()
-            content = self.controller().limit_return_parameters(models, keys)[:pairs.get("size")]
-            return response_maker(content, 200)
-
-    def post(self) -> BaseResponse:
-        """ POST /api/tags content-type: application/json """
-        content = self.controller().create(request.get_json())
-        return response_maker(content, 201)
-
-
-class TagItemEndpoint(MethodView):
-    """ /api/tags/<item_name> """
-    def __init__(self):
-        self.controller = c.TagController
-
-    def get(self, item_name: str) -> BaseResponse:
-        """ GET /api/tags/<item_name>?query """
-        if not request.args:
-            content = self.controller().get_by_primary(int(item_name))
-            return response_maker(content, 200)
-        else:
-            keys, pairs = split_query()
-            if pairs.get("filter") == "id":
-                content = self.controller().get_by_primary(int(item_name))
-                content = self.controller().limit_return_parameters(content, keys)
-                return response_maker(content, 200)
-            elif pairs.get("filter") == "name":
-                content = self.controller().get_by_name(item_name)
-                content = self.controller().limit_return_parameters(content, keys)
-                return response_maker(content, 200)
-            elif pairs.get("filter"):
-                content = self.controller().get_by_attr({pairs.get("filter"): item_name})
-                content = self.controller().limit_return_parameters(content, keys)
-                return response_maker(content, 200)
-
-    def patch(self, item_name: int) -> BaseResponse:
-        """ PATCH /api/tags/<item_name> """
-        content = self.controller().update_one(int(item_name), request.get_json())
-        return response_maker(content, 200)
-
-    def delete(self, item_name: int) -> BaseResponse:
-        """ DELETE /api/tags/<item_name> """
-        content = self.controller().delete_one(int(item_name))
-        if not content:
-            return response_maker(content, 404)
-        else:
-            return response_maker(content, 204)
 
 
 @app.route("/api", methods=["GET"])

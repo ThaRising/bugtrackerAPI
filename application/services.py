@@ -1,6 +1,8 @@
 import application.models as models
 from application import db
 from typing import List, Union, Dict, Optional
+from sqlalchemy import exc
+from flask import abort
 
 
 class Service:
@@ -21,28 +23,27 @@ class Service:
     def model(self) -> None:
         raise AttributeError("Cannot delete model attribute.")
 
-    def __repr__(self) -> str:
-        return f"'{self.__class__.__name__}'('{self.model.__class__.__name__}')'"
-
-    def __len__(self) -> int:
-        return len(self.model.query.all())
-
-    def __getitem__(self, item: any) -> Union[db.Model, List[db.Model], None]:
-        if type(item) == int:
-            return self.get_all()[item]
-        elif type(item) == str or type(item) == dict:
-            return self.get_by_attr(item)
-
     def create(self, params: Dict[str, Union[str, int]]) -> db.Model:
-        created_object = self.model(**params)
-        db.session.add(created_object)
-        db.session.commit()
+        try:
+            created_object = self.model(**params)
+            db.session.add(created_object)
+            db.session.commit()
+        except exc.IntegrityError:
+            db.session.rollback()
+            return abort(400)
+        except ValueError:
+            db.session.rollback()
+            return abort(400)
         return created_object
 
     def update(self, model: db.Model, params: dict) -> Union[db.Model]:
-        for field, value in params.items():
-            setattr(model, field, value)
-        db.session.commit()
+        try:
+            for field, value in params.items():
+                setattr(model, field, value)
+            db.session.commit()
+        except exc.IntegrityError:
+            db.session.rollback()
+            return abort(400)
         return model
 
     def delete(self, model: db.Model) -> None:
@@ -50,16 +51,8 @@ class Service:
         db.session.delete(model)
         db.session.commit()
 
-    def get_all(self) -> Optional[List[db.Model]]:
+    def get(self, params) -> Optional[List[db.Model]]:
         """ Returns all rows of the given Table """
-        return self.model.query.all()
-
-    def get_by_primary(self, id_: Union[id, List[int]]) -> Optional[db.Model]:
-        """ Returns the row with the given primary key """
-        return self.model.query.get(id_)
-
-    def get_by_attr(self, params: Dict[str, Union[str, int]]) -> List[Optional[db.Model]]:
-        """ Returns all rows containing the given value in the given column """
         return self.model.query.filter_by(**params).all()
 
 

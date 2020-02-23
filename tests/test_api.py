@@ -12,7 +12,7 @@ class BaseTestCase(TestCase):
 class TestTag(BaseTestCase):
     def setUp(self):
         db.create_all()
-        with open("C:\\Users\\ben.koch\\Desktop\\sbin\\pyAPI\\test_data\\tags.json") as json_file:
+        with open("/tests/test_data\\tags.json") as json_file:
             self.data = json.load(json_file)
         self.test_success = self.data["validation_success"]
         self.test_fails = self.data["validation_fail"]
@@ -45,13 +45,21 @@ class TestTag(BaseTestCase):
         self.assertEqual(response.status_code, 400)
         # Tests with wrong header value and empty payload
         response = self.client.post(base_url, content_type="text/plain")
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 406)
         # Tests with correct header and payload of length 0
         response = self.client.post(base_url, content_type="application/json", json="")
         self.assertEqual(response.status_code, 400)
         # Tests with correct header and payload with bad json format
         response = self.client.post(base_url, content_type="application/json", json="name=Test")
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 415)
+        # Should succeed
+        for set_ in self.test_success:
+            response = self.client.post(base_url, content_type="application/json", json=set_)
+            self.assertEqual(response.status_code, 201)
+        # Should fail
+        for set_ in self.test_fails:
+            response = self.client.post(base_url, content_type="application/json", json=set_)
+            self.assertGreaterEqual(response.status_code, 400)
 
 
 if __name__ == '__main__':

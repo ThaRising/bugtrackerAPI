@@ -1,7 +1,13 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_restplus import Api
 
 db = SQLAlchemy()
+api = Api(
+    title="OrcTracker API",
+    version="0.4a",
+    description="OrcTracker Project REST API."
+)
 
 
 def create_app(env_type: str = "dev"):
@@ -14,11 +20,11 @@ def create_app(env_type: str = "dev"):
         app.config.from_object("application.config.Config")
 
     db.init_app(app)
+    api.init_app(app)
 
     with app.app_context():
-        from . import views
+        from .views.tag import api as tag_namespace
+        api.add_namespace(tag_namespace, path="/api/tags")
         from . import models
-        app.add_url_rule("/api/tags", view_func=views.TagEndpoint.as_view("tag_endpoint"))
-        app.add_url_rule("/api/tags/<item_name>", view_func=views.TagItemEndpoint.as_view("tag_item_endpoint"))
 
         return app
