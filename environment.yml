@@ -1,4 +1,4 @@
-name: D:\6_pyProjects\pyAPI2\venv
+name: null
 channels:
   - defaults
 dependencies:
@@ -33,5 +33,3 @@ dependencies:
     - six==1.14.0
     - webargs==5.5.3
     - zipp==3.0.0
-prefix: D:\6_pyProjects\pyAPI2\venv
-
