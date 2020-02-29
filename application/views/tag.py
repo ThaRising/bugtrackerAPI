@@ -6,6 +6,7 @@ from application.controllers import TagController
 
 api = Namespace("tags", description="Tag Resource Endpoint")
 
+controller = TagController
 
 tag = api.model("Tag", {
     "id": flask_fields.Integer(),
@@ -33,12 +34,12 @@ class Tags(Resource):
 
         @api.marshal_with(tag, mask=mask)
         def response():
-            return [dict(i) for i in TagController().get({})]
+            return [dict(i) for i in controller().get({})]
         return response()
 
     @use_kwargs(json_args_post, locations=("json",))
     def post(self, **kwargs):
-        return dict(TagController().create(kwargs))
+        return dict(controller().create(kwargs))
 
 
 query_args = {
@@ -64,14 +65,14 @@ class Tag(Resource):
 
         @api.marshal_with(tag, mask=mask)
         def response(identifier: str):
-            return [dict(i) for i in TagController().get({filter_by: identifier})]
+            return [dict(i) for i in controller().get({filter_by: identifier})]
         return response(tag_id)
 
     @use_kwargs(json_args_patch, locations=("json",))
     def patch(self, tag_id: str, **kwargs):
-        return dict(TagController().update(int(tag_id), kwargs))
+        return dict(controller().update(int(tag_id), kwargs))
 
     def delete(self, tag_id: str):
-        operation = TagController().delete(int(tag_id))
+        operation = controller().delete(int(tag_id))
         return 200 if operation else 500
 
