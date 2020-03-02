@@ -1,10 +1,16 @@
 FROM ubuntu:trusty
 MAINTAINER ThaRising
 
+COPY /application /data/api/application
+COPY wsgi.py /data/api/wsgi.py
+COPY requirements.txt /data/api/requirements.txt
+
 RUN sudo apt-get -y update && sudo apt-get -y upgrade
 
-RUN sudo apt-get install -y sqlite3 libsqlite3-dev && mkdir /db
+RUN sudo apt-get install -y pip
 
-RUN /usr/bin/sqlite3 /db/test.db
+RUN sudo pip install -r /data/api/requirements.txt
+
+RUN sudo python3.7 /data/api/wsgi.py
 
 CMD /bin/bash
