@@ -1,5 +1,7 @@
 from tests import BaseTestCase as FlaskTest
 import unittest
+from pathlib import Path
+import json
 
 
 class TestTag(FlaskTest):
@@ -24,14 +26,18 @@ class TestTag(FlaskTest):
         # Tests with correct header and payload with bad json format
         response = self.client.post(base_url, content_type="application/json", json="name=Test")
         self.assertEqual(response.status_code, 422)
-        # # Should succeed
-        # for set_ in self.test_success:
-        #     response = self.client.post(base_url, content_type="application/json", json=set_)
-        #     self.assertEqual(response.status_code, 201)
-        # # Should fail
-        # for set_ in self.test_fails:
-        #     response = self.client.post(base_url, content_type="application/json", json=set_)
-        #     self.assertGreaterEqual(response.status_code, 400)
+        # Should succeed
+        with open(Path(__file__).parent / "test_data" / "tags.json") as json_file:
+            self.test_data = json.load(json_file)
+        self.test_success = self.test_data["validation_success"]
+        self.test_failure = self.test_data["validation_fail"]
+        for set_ in self.test_success:
+            response = self.client.post(base_url, content_type="application/json", json=set_)
+            self.assertEqual(response.status_code, 200)
+        # Should fail
+        for set_ in self.test_failure:
+            response = self.client.post(base_url, content_type="application/json", json=set_)
+            self.assertGreaterEqual(response.status_code, 422)
 
 
 if __name__ == '__main__':
