@@ -6,7 +6,8 @@ db = SQLAlchemy()
 api = Api(
     title="OrcTracker API",
     version="0.5a",
-    description="OrcTracker Project REST API"
+    description='OrcTracker Project REST API'
+                '<style>.models {display: none !important}</style>'
 )
 
 
