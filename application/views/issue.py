@@ -37,6 +37,8 @@ json_args_post = {
 
 
 @api.route("/")
+@api.doc(post={"params": {"id": "test"}})
+@api.response(422, "u succ")
 class Issues(Resource):
     @use_kwargs(query_args, locations=("query",))
     def get(self, **kwargs):
