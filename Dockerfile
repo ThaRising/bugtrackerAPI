@@ -1,16 +1,20 @@
-FROM ubuntu:trusty
+FROM ubuntu:16.04
 MAINTAINER ThaRising
+
+RUN apt-get update -y && \
+    apt-get install -y python-pip python-dev
 
 COPY /application /data/api/application
 COPY wsgi.py /data/api/wsgi.py
 COPY requirements.txt /data/api/requirements.txt
 
-RUN sudo apt-get -y update && sudo apt-get -y upgrade
+RUN pip install -r /data/api/requirements.txt
 
-RUN sudo apt-get install -y pip
+COPY /venv/Lib/site-packages/flask_restplus/fields.py /usr/local/lib/python3.7/site-packages/flask_restplus/fields.py
+COPY /venv/Lib/site-packages/flask_restplus/api.py /usr/local/lib/python3.7/site-packages/flask_restplus/api.py
 
-RUN sudo pip install -r /data/api/requirements.txt
+WORKDIR /data/api/
 
-RUN sudo python3.7 /data/api/wsgi.py
+ENTRYPOINT [ "python" ]
 
-CMD /bin/bash
+CMD [ "wsgi.py" ]
