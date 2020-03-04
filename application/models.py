@@ -103,7 +103,6 @@ class Type(db.Model):
         return 2
 
 
-
 class User(db.Model):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
@@ -177,7 +176,7 @@ class Comment(db.Model):
         yield "author", self.author
         yield "content", self.content
         yield "edited", self.edited
-        yield "created_on", self.created_on
+        yield "created_on", str(self.created_on)
 
     def __len__(self) -> int:
         """
@@ -249,7 +248,7 @@ class Issue(db.Model):
         yield "status", self.status
         yield "priority", self.priority
         yield "comments", self.comments
-        yield "created_on", self.created_on
+        yield "created_on", str(self.created_on)
 
     def __len__(self) -> int:
         """

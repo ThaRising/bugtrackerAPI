@@ -14,10 +14,10 @@ issue = api.model("Issue", {
     "reporter": flask_fields.Integer(),
     "assignee": flask_fields.Integer(),
     "description": flask_fields.String(),
+    "comments": flask_fields.List(flask_fields.String),
     "type": flask_fields.Integer(),
     "status": flask_fields.Integer(),
-    "priority": flask_fields.Integer(),
-    "created_on": flask_fields.DateTime()
+    "priority": flask_fields.Integer()
 })
 
 query_args = {
