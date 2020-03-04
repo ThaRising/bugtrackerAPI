@@ -12,7 +12,8 @@ comment = api.model("Comment", {
     "id": flask_fields.Integer(),
     "parent_id": flask_fields.Integer(),
     "author": flask_fields.Integer(),
-    "content": flask_fields.String()
+    "content": flask_fields.String(),
+    "created": flask_fields.String(attribute="created_on")
 })
 
 query_args = {

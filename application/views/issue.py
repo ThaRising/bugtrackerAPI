@@ -3,6 +3,7 @@ from flask_restplus import fields as flask_fields
 from webargs import fields, validate
 from webargs.flaskparser import use_kwargs
 from application.controllers import IssueController
+from .comment import comment
 
 api = Namespace("issues", description="Issue Resource Endpoint")
 
@@ -14,7 +15,7 @@ issue = api.model("Issue", {
     "reporter": flask_fields.Integer(),
     "assignee": flask_fields.Integer(),
     "description": flask_fields.String(),
-    "comments": flask_fields.List(flask_fields.String),
+    "comments": flask_fields.Nested(comment, skip_none=False),
     "type": flask_fields.Integer(),
     "status": flask_fields.Integer(),
     "priority": flask_fields.Integer()
