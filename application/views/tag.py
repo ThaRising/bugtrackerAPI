@@ -3,6 +3,7 @@ from flask_restplus import fields as flask_fields
 from webargs import fields, validate
 from webargs.flaskparser import use_kwargs
 from application.controllers import TagController
+from . import Collection
 
 api = Namespace("tags", description="Tag Resource Endpoint")
 
@@ -15,10 +16,6 @@ tag = api.model("Tag", {
     "color": flask_fields.String()
 })
 
-query_args = {
-    "fields": fields.DelimitedList(fields.Str())
-}
-
 json_args_post = {
     "name": fields.Str(validate=validate.Length(min=1), required=True),
     "background": fields.Str(validate=lambda v: len(v) == 6, required=False),
@@ -27,19 +24,20 @@ json_args_post = {
 
 
 @api.route("/")
-class Tags(Resource):
-    @use_kwargs(query_args, locations=("query",))
+class Tags(Resource, Collection):
+    @use_kwargs(Collection.query_args, locations=("query",))
     def get(self, **kwargs):
-        mask = "*" if not kwargs.get("fields") else ",".join(kwargs.get("fields"))
-
-        @api.marshal_with(tag, mask=mask)
+        @api.marshal_with(tag, mask=Collection.mask(kwargs))
         def response():
             return [dict(i) for i in controller().get({})]
         return response()
 
     @use_kwargs(json_args_post, locations=("json",))
     def post(self, **kwargs):
-        return dict(controller().create(kwargs))
+        @api.marshal_with(tag)
+        def response():
+            return dict(controller().create(kwargs))
+        return response()
 
 
 query_args = {
