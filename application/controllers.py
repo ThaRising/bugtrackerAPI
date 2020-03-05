@@ -1,8 +1,8 @@
 from application import db
 from flask import abort
-import application.models as models
+import application.models.models as models
 from sqlalchemy import exc
-from typing import Type, Union, Dict, List, Optional
+from typing import Union, Dict, List, Optional
 
 
 class Controller:
