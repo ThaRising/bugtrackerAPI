@@ -42,8 +42,8 @@ class TagCollection(Resource):
         return collection.get(**kwargs)
 
     @api.param("name", "Visible name of the Tag", required=True, _in="body", example="Frontend")
-    @api.param("background", "Optional: 6 digit hex color value without a #", _in="body", example="ffffff")
-    @api.param("color", "Optional: 6 digit hex color value without a #", _in="body", example="000000")
+    @api.param("background", "Tag background color, 6 digit hex color value without a #", _in="body", example="ffffff")
+    @api.param("color", "Tag foreground color, 6 digit hex color value without a #", _in="body", example="000000")
     @use_kwargs(json_args_post, locations=("json",))
     def post(self, **kwargs):
         return collection.post(**kwargs)
@@ -62,6 +62,9 @@ class TagItem(Resource):
         return item.get(tag_id, **kwargs)
 
     @api.param("tag_id", "Database ID of the Tag to be modified", _in="path")
+    @api.param("name", "Visible name of the Tag", _in="body", example="Updated Frontend")
+    @api.param("background", "Tag background color, 6 digit hex color value without a #", _in="body", example="212121")
+    @api.param("color", "Tag foreground color, 6 digit hex color value without a #", _in="body", example="f0f0f0")
     @use_kwargs(json_args_patch, locations=("json",))
     def patch(self, tag_id: str, **kwargs):
         return item.patch(tag_id, **kwargs)
