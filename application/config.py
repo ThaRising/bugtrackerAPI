@@ -3,6 +3,7 @@ class Config:
     TESTING = False
     SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SWAGGER_SUPPORTED_SUBMIT_METHODS = []
 
 
 class DevelopmentConfig(Config):
