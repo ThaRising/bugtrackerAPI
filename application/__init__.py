@@ -30,7 +30,14 @@ def create_app(env_type: str = "dev"):
         api.add_namespace(tag_api, path="/api/tags")
         api.add_namespace(type_api, path="/api/types")
         api.add_namespace(user_api, path="/api/users")
-        from . import models
+
+        @app.after_request
+        def add_headers(response):
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            response.headers['Access-Control-Allow-Headers'] = \
+                "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
+            response.headers['Access-Control-Allow-Methods'] = "POST, GET, PATCH, DELETE"
+            return response
 
         return app
 
