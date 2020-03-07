@@ -40,6 +40,7 @@ json_args_post = {
 
 json_args_patch = {
     "title": fields.Str(validate=validate.Length(min=1), required=False),
+    "tags": fields.List(fields.Int(), required=False),
     "assignee": fields.Int(validate=lambda v: v > 0, required=False),
     "description": fields.Str(required=False),
     "type": fields.Int(validate=lambda v: v >= 0, required=False),
