@@ -2,6 +2,7 @@ from application import db
 from flask import abort
 import application.models.models as models
 from sqlalchemy import exc
+from sqlalchemy.orm.exc import FlushError
 from typing import Union, Dict, List, Optional
 
 
@@ -37,16 +38,19 @@ class Controller:
         return created_object
 
     def update(self, key: int, params: Dict[str, Union[str, int]]) -> Optional[db.Model]:
-        update_model = self.model.query.get(key)
+        update_model = self.model.query.filter_by(id=key)
         if not update_model or update_model is None:
             return
-        return self.model().update(update_model, params)
+        update_model.update(params)
+        db.session.commit()
+        return update_model
 
     def delete(self, key: Union[int, dict]) -> bool:
         delete_model = self.model.query.get(key)
         if not delete_model or delete_model is None:
             return False
-        self.model().delete(delete_model)
+        db.session.delete(delete_model)
+        db.session.commit()
         return True
 
 
@@ -88,4 +92,19 @@ class IssueController(Controller):
         except exc.IntegrityError or ValueError:
             db.session.rollback()
             return abort(400)
+        except FlushError:
+            db.session.rollback()
+            db.session.delete(created_object)
+            raise exc.AmbiguousForeignKeysError
         return created_object
+
+    def update(self, key: int, params: Dict[str, Union[str, int]]) -> Optional[db.Model]:
+        tags = params.pop("tags", None)
+        update_model = self.model.query.filter_by(id=key)
+        if not update_model or update_model is None:
+            return
+        update_model.update(params)
+        db.session.commit()
+        if not tags and tags is not None:
+            update_model.tags[:] = tags
+        return update_model
