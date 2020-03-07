@@ -74,5 +74,18 @@ class IssueController(Controller):
     def __init__(self):
         super(IssueController, self).__init__(models.Issue)
 
-    def add_comment(self, comment: db.Model):
-        self.model.comments.append(comment)
+    def create(self, params: Dict[str, Union[str, int]]) -> db.Model:
+        try:
+            tags = params.pop("tags", None)
+            created_object = self.model(**params)
+            db.session.add(created_object)
+            db.session.commit()
+            if tags and tags is not None:
+                for tag in tags:
+                    db_tag = models.Tag.query.get(tag)
+                    created_object.tags.append(db_tag)
+                db.session.commit()
+        except exc.IntegrityError or ValueError:
+            db.session.rollback()
+            return abort(400)
+        return created_object
