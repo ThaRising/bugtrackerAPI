@@ -4,6 +4,7 @@ from webargs import fields, validate
 from webargs.flaskparser import use_kwargs
 from application.controllers import IssueController
 from .comment import rest_model as comment
+from .tag import rest_model as tag
 from . import CollectionFactory, ItemFactory
 from application.models import data_models
 
@@ -13,6 +14,7 @@ controller = IssueController
 rest_model = api.model("Issue", {
     "id": flask_fields.Integer(),
     "title": flask_fields.String(),
+    "tags": flask_fields.Nested(tag, skip_none=False),
     "reporter": flask_fields.Integer(),
     "assignee": flask_fields.Integer(),
     "description": flask_fields.String(),
@@ -27,12 +29,13 @@ item = ItemFactory(controller, rest_model)
 
 json_args_post = {
     "title": fields.Str(validate=validate.Length(min=1), required=True),
+    "tags": fields.List(fields.Int(), required=False),
     "reporter": fields.Int(validate=lambda v: v > 0, required=True),
     "assignee": fields.Int(validate=lambda v: v > 0, required=False),
     "description": fields.Str(required=False),
-    "type": fields.Int(validate=lambda v: v >= 0, required=False),
-    "status": fields.Int(validate=lambda v: v >= 0, required=False),
-    "priority": fields.Int(validate=lambda v: v >= 0, required=False)
+    "type": fields.Int(validate=lambda v: v > 0, required=False),
+    "status": fields.Int(validate=lambda v: data_models.validate_status(v), required=False),
+    "priority": fields.Int(validate=lambda v: data_models.validate_priority(v), required=False)
 }
 
 json_args_patch = {
