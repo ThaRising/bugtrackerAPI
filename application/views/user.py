@@ -43,19 +43,19 @@ json_args_patch = {
 @api.response(404, "Not a valid identifier")
 class User(Resource):
     @use_kwargs(query_args, locations=("query",))
-    def get(self, tag_id: str, **kwargs):
+    def get(self, user_id: str, **kwargs):
         filter_by = kwargs.get("filter")
 
         @api.marshal_with(user)
         def response(identifier: str):
             return [dict(i) for i in controller().get({filter_by: identifier})]
-        return response(tag_id)
+        return response(user_id)
 
     @use_kwargs(json_args_patch, locations=("json",))
-    def patch(self, tag_id: str, **kwargs):
-        return dict(controller().update(int(tag_id), kwargs))
+    def patch(self, user_id: str, **kwargs):
+        return dict(controller().update(int(user_id), kwargs))
 
-    def delete(self, tag_id: str):
-        operation = controller().delete(int(tag_id))
+    def delete(self, user_id: str):
+        operation = controller().delete(int(user_id))
         return 200 if operation else 500
 
