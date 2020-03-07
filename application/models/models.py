@@ -196,7 +196,7 @@ class Issue(db.Model):
     type = db.Column(db.Integer, db.ForeignKey("type.id"), default=None)
     tags = db.relationship("Tag", secondary=tags_association, back_populates="issues")
     status = db.Column(db.Integer, default=1)
-    priority = db.Column(db.Integer, default=1)
+    priority = db.Column(db.Integer, default=3)
     comments = db.relationship("Comment", backref="parent")
     created_on = db.Column(db.DateTime, default=datetime.utcnow())
     __table_args__ = (
