@@ -106,7 +106,7 @@ class IssueController(Controller):
             return
         if params:
             update_model.update(params)
-        if tags and tags is not None:
+        if tags is not None:
             tags = [models.Tag.query.get(i) for i in tags]
             update_model.first().tags = tags
         try:
