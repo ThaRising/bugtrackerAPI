@@ -36,7 +36,7 @@ class ItemFactory:
         return marshal([dict(i) for i in self.controller().get({filter_by: identifier})], self.model, mask=mask), 200
 
     def patch(self, identifier, **kwargs):
-        return marshal([dict(i) for i in self.controller().update(int(identifier), kwargs)], self.model), 200
+        return marshal(dict(self.controller().update(int(identifier), kwargs)), self.model), 200
 
     def delete(self, identifier):
         operation = self.controller().delete(int(identifier))

@@ -104,8 +104,14 @@ class IssueController(Controller):
         update_model = self.model.query.filter_by(id=key)
         if not update_model or update_model is None:
             return
-        update_model.update(params)
-        db.session.commit()
-        if not tags and tags is not None:
-            update_model.tags[:] = tags
-        return update_model
+        if params:
+            update_model.update(params)
+        if tags and tags is not None:
+            tags = [models.Tag.query.get(i) for i in tags]
+            update_model.first().tags = tags
+        try:
+            db.session.commit()
+        except FlushError:
+            db.session.rollback()
+            raise exc.AmbiguousForeignKeysError
+        return update_model.first()
