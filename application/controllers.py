@@ -95,6 +95,7 @@ class IssueController(Controller):
         except FlushError:
             db.session.rollback()
             db.session.delete(created_object)
+            db.session.commit()
             raise exc.AmbiguousForeignKeysError
         return created_object
 
