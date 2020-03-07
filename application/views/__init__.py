@@ -1,4 +1,5 @@
 from flask_restplus import marshal
+from flask import make_response
 from webargs import fields, validate
 
 
@@ -39,7 +40,7 @@ class ItemFactory:
 
     def delete(self, identifier):
         operation = self.controller().delete(int(identifier))
-        return 200 if operation else 500
+        return make_response("", 200) if operation else make_response("", 404)
 
 
 from .comment import api as comment_api
