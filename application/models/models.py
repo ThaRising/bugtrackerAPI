@@ -1,6 +1,7 @@
 from application import db
 from datetime import datetime
 from application.config import TOO_SHORT, TYPE_NOT_COLOR, OUT_OF_RANGE
+import application.models.data_models as data_models
 
 tags_association = db.Table("tags_association",
                             db.Column("issue_id", db.Integer, db.ForeignKey("issue.id")),
@@ -194,16 +195,16 @@ class Issue(db.Model):
     description = db.Column(db.Text)
     type = db.Column(db.Integer, db.ForeignKey("type.id"), default=None)
     tags = db.relationship("Tag", secondary=tags_association, back_populates="issues")
-    status = db.Column(db.Integer, default=0)
-    priority = db.Column(db.Integer, default=0)
+    status = db.Column(db.Integer, default=1)
+    priority = db.Column(db.Integer, default=1)
     comments = db.relationship("Comment", backref="parent")
     created_on = db.Column(db.DateTime, default=datetime.utcnow())
     __table_args__ = (
         db.CheckConstraint("length(title) > 0",
                            name="title_min_length"),
-        db.CheckConstraint("priority < 3",
+        db.CheckConstraint(f"priority < {len(data_models.PRIORITY)}",
                            name="priority_max_length"),
-        db.CheckConstraint("status < 5",
+        db.CheckConstraint(f"status < {len(data_models.STATUS)}",
                            name="status_max_length"),
     )
 
@@ -215,13 +216,13 @@ class Issue(db.Model):
 
     @db.validates("priority")
     def validate_background(self, key, priority: int) -> int:
-        if priority > 2:
+        if not data_models.validate_priority(priority):
             raise ValueError(OUT_OF_RANGE)
         return priority
 
     @db.validates("status")
     def validate_background(self, key, status: int) -> int:
-        if status > 5:
+        if not data_models.validate_status(status):
             raise ValueError(OUT_OF_RANGE)
         return status
 
