@@ -132,7 +132,7 @@ class User(db.Model):
         """
         yield "id", self.id
         yield "name", self.name
-        yield "created_on", self.created_on
+        yield "created_on", str(self.created_on)
 
     def __len__(self) -> int:
         """
