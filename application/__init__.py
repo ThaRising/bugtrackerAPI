@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_restplus import Api
+from sqlalchemy import exc
 
 db = SQLAlchemy()
 api = Api(
@@ -38,6 +39,11 @@ def create_app(env_type: str = "dev"):
                 "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
             response.headers['Access-Control-Allow-Methods'] = "POST, GET, PATCH, DELETE"
             return response
+
+        @api.errorhandler(exc.AmbiguousForeignKeysError)
+        def handle_ambiguous_foreign_keys(error):
+            return {'error': 'ERR_AMBIGUOUS_FOREIGN_KEYS',
+                    'message': 'Some of the Database IDs that were provided match no entries in the database.'}, 400
 
         return app
 
