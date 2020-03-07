@@ -124,7 +124,7 @@ class User(db.Model):
         """
         :return: Returns a string representation of the object
         """
-        return f"{self.__class__.__name__}('name': '{self.name}', 'created_on': '{self.created_on}')"
+        return f"{self.__class__.__name__}('name': '{self.name}', 'created_on': '{str(self.created_on)}')"
 
     def __iter__(self) -> None:
         """
