@@ -20,3 +20,15 @@ TYPE = [
     (3, "MEETING", "Meeting"),
     (4, "REFACTOR", "Refactor")
 ]
+
+
+def validate_priority(value: int) -> bool:
+    return False if value > len(PRIORITY) or value < 1 else True
+
+
+def validate_status(value: int) -> bool:
+    return False if value > len(STATUS) or value < 1 else True
+
+
+def validate_type(value: int) -> bool:
+    return False if value > len(TYPE) or value < 1 else True
