@@ -202,9 +202,9 @@ class Issue(db.Model):
     __table_args__ = (
         db.CheckConstraint("length(title) > 0",
                            name="title_min_length"),
-        db.CheckConstraint(f"priority < {len(data_models.PRIORITY)}",
+        db.CheckConstraint(f"priority < {len(data_models.PRIORITY) + 1}",
                            name="priority_max_length"),
-        db.CheckConstraint(f"status < {len(data_models.STATUS)}",
+        db.CheckConstraint(f"status < {len(data_models.STATUS) + 1}",
                            name="status_max_length"),
     )
 
