@@ -43,7 +43,7 @@ class Controller:
             return
         update_model.update(params)
         db.session.commit()
-        return update_model
+        return update_model.first()
 
     def delete(self, key: Union[int, dict]) -> bool:
         delete_model = self.model.query.get(key)
