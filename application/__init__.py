@@ -6,7 +6,7 @@ from sqlalchemy import exc
 db = SQLAlchemy()
 api = Api(
     title="OrcTracker API",
-    version="0.5a",
+    version="1.0",
     description='OrcTracker Project REST API'
                 '<style>.models {display: none !important}</style>'
 )
