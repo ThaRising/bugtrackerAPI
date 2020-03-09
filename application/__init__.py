@@ -26,11 +26,11 @@ def create_app(env_type: str = "dev"):
 
     with app.app_context():
         from .views import comment_api, issue_api, tag_api, type_api, user_api
-        api.add_namespace(comment_api, path="/api/comments")
-        api.add_namespace(issue_api, path="/api/issues")
-        api.add_namespace(tag_api, path="/api/tags")
-        api.add_namespace(type_api, path="/api/types")
-        api.add_namespace(user_api, path="/api/users")
+        api.add_namespace(comment_api, path="/comments")
+        api.add_namespace(issue_api, path="/issues")
+        api.add_namespace(tag_api, path="/tags")
+        api.add_namespace(type_api, path="/types")
+        api.add_namespace(user_api, path="/users")
 
         @app.after_request
         def add_headers(response):
