@@ -1,7 +1,7 @@
 from application import db
 from datetime import datetime
 from application.config import TOO_SHORT, TYPE_NOT_COLOR, OUT_OF_RANGE
-import application.models.data_models as data_models
+from ..models import data_models
 
 tags_association = db.Table("tags_association",
                             db.Column("issue_id", db.Integer, db.ForeignKey("issue.id")),
