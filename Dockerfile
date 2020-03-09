@@ -5,7 +5,7 @@ RUN apt-get update -y && \
     apt-get install -y python-pip python-dev
 
 COPY /application /data/api/application
-COPY wsgi.py /data/api/wsgi.py
+COPY app.py /data/api/wsgi.py
 COPY requirements.txt /data/api/requirements.txt
 
 RUN pip install -r /data/api/requirements.txt
